@@ -1,9 +1,7 @@
 {
-  "name": "server",
+  "name": "el-juego",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
-  "dependencies": {
-    "grunt": "^1.4.1"
-  }
+  "dependencies": {}
 }
