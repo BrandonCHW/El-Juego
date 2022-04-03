@@ -1,14 +1,25 @@
 
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
 
-function PlayerCard({ value }) {
+// todo change class name from playercard to card (generic)
+/**
+ * A playing card (value: 1-100)
+ * @param {*} param0 
+ * @returns 
+ */
+function PlayerCard(props) {
+    let color = !props.isCenterCard ? 'yellow' : 'lime'
+
+
     return (
-        <Button>
-            {value}
+        <Button 
+            style={{background: props.isSelectedCard ? color : 'white'}}
+            onClick={props.onClick}
+            >
+            {props.value}
         </Button>
     )
 }
-
 
 export default PlayerCard

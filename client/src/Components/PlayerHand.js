@@ -1,21 +1,44 @@
 
 import Card from './PlayerCard'
 import { useState, useEffect } from 'react'
+import { Button } from 'react-bootstrap'
 
-function PlayerHand({ name, hand}) {
+function PlayerHand(props) {
+    const [selectedCard, setSelectedCard] = useState({key: -1, value: 0})
+
     useEffect = (() => {
         // console.log(hand)
     })
 
+    const handleClick = (event, card) => {
+        setSelectedCard(card)
+    }
+
+    const handlePlayCard = () => {
+        if (selectedCard.key <= 0) {
+            console.log('nothing to play. please select a card')
+        } else {
+            props.onPlay(selectedCard.value)
+        }
+    }
+
     return (
+        // todo make them radio buttons
         <div>
-            <label>{name}: </label>
-            { hand[0] ? <Card value={hand[0]}/> : <></>}
-            { hand[1] ? <Card value={hand[1]}/> : <></>}
-            { hand[2] ? <Card value={hand[2]}/> : <></>}
-            { hand[3] ? <Card value={hand[3]}/> : <></>}
-            { hand[4] ? <Card value={hand[4]}/> : <></>}
-            { hand[5] ? <Card value={hand[5]}/> : <></>}
+            <label>{props.name}: </label>
+            {props.hand.map((cardLabel, i) => {
+                return (
+                <Card 
+                    key={i} 
+                    value={cardLabel} 
+                    onClick={(event) => handleClick(event, {key: i, value: cardLabel})} 
+                    isSelectedCard={selectedCard.key === i}
+                />)
+            })} {' '}
+            <Button
+                onClick={() => handlePlayCard()}>
+                Play Card
+            </Button>
         </div>
     );
 }
