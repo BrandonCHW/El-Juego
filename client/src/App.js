@@ -14,7 +14,7 @@ function App() {
 		</ul>
 		<Routes>
 		  <Route exact path="/" element={<Main />} />
-		  <Route exact path='/test' element={<TheTest />} />
+		  {/* <Route path='/test' element={<TheTest />} /> */}
 		</Routes>
 	  </div>
 	</Router>
