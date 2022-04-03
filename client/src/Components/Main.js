@@ -8,7 +8,7 @@ function Main() {
     return ( 
         <div className="Main">
           <h2>HELLO</h2>
-          <p>inside lobby</p>
+          <p style={{color: "red", background: '#282c34'}}>inside lobby</p>
         </div> 
     );
 }
