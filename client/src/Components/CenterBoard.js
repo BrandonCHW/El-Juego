@@ -5,10 +5,6 @@ import "./CenterBoard.css";
 function CenterBoard(props) {
   const [selectedCard, setSelectedCard] = useState({ key: -1, value: 0 });
 
-  useEffect = () => {
-    // console.log(hand)
-  };
-
   const handleClick = (event, card) => {
     props.onSelectPile(card.key)
     setSelectedCard(card);

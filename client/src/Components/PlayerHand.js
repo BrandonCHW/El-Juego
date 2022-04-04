@@ -5,10 +5,6 @@ import { Button } from "react-bootstrap";
 function PlayerHand(props) {
   const [selectedCard, setSelectedCard] = useState({ key: -1, value: 0 });
 
-  useEffect = () => {
-    // console.log(hand)
-  };
-
   const handleClick = (event, card) => {
     setSelectedCard(card);
     console.log('selected new card: ', card)
