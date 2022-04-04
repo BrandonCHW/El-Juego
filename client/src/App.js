@@ -6,15 +6,15 @@ import TheTest from './Components/Test'
 
 function App() {
   return (
-	<Router>
+	<Router basename='/'>
 	  <div>
 		<ul>
 			<li><NavLink to='/'>Lobby</NavLink></li>
-			<li><NavLink to='/test'>Test</NavLink></li>
+			<li><NavLink to='/test/'>Test</NavLink></li>
 		</ul>
 		<Routes>
 		  <Route exact path="/" element={<Main />} />
-		  {/* <Route path='/test' element={<TheTest />} /> */}
+		  <Route exact path='/test/' element={<TheTest />} />
 		</Routes>
 	  </div>
 	</Router>

@@ -10,8 +10,7 @@ import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
  */
 function PlayerCard(props) {
     let color = !props.isCenterCard ? 'yellow' : 'lime'
-
-
+    
     return (
         <Button 
             style={{background: props.isSelectedCard ? color : 'white'}}
