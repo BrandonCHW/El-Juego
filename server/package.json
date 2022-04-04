@@ -1,8 +1,11 @@
 {
-  "name": "el-juego",
+  "name": "el-juego-backend",
   "version": "1.0.0",
   "main": "app.js",
   "license": "MIT",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
   "dependencies": {
     "express": "^4.17.3",
     "socket.io": "^4.4.1"
