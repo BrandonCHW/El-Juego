@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import ButtonTest from './ButtonTest';
 import CenterBoard from './CenterBoard';
-import TestComponent from './TestComponent';
 
 function TheTest() {
     const [globalCount, setGlobalCount] = useState(0)
@@ -34,8 +32,6 @@ function TheTest() {
     
             <p>Duis a turpis sed lacus dapibus elementum sed eu lectus.</p>
             </div> 
-            <ButtonTest onClick={handleClick} onSelectPile={handleClick2}></ButtonTest>
-            <TestComponent parentCallback={handleClick}></TestComponent>
             <CenterBoard onSelectPile={handleClick}></CenterBoard>
         </>
     );
