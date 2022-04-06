@@ -5,6 +5,7 @@ const cors = require('cors')
 const http = require('http')
 const server = http.createServer(app)
 const { Server } = require("socket.io")
+const { emit } = require('process')
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000"
@@ -22,6 +23,12 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log('a user has disconnected')
+  })
+
+  socket.on('player-action', (action) => {
+    console.log(action) // PlayerAction
+
+    socket.emit("new-game-state", { hello: 'yo'})
   })
 })
 

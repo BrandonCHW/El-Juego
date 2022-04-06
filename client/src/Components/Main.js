@@ -4,6 +4,7 @@ import PlayerHand from './PlayerHand'
 import CenterBoard from './CenterBoard';
 import { Button } from 'react-bootstrap';
 import io from 'socket.io-client'
+import { PlayerAction } from '../common/player-action'
 
 function Main(props) {
     // 1 state per values that tend to change together
@@ -19,13 +20,16 @@ function Main(props) {
         
     useEffect(() => {
         if (connect) {
-        const newSocket = io(`http://${window.location.hostname}:4000`) 
-        console.log(`connected to: http://${window.location.hostname}:4000`)
-        setSocket(newSocket)
-        
-        return () => {
-            newSocket.close() // si la page rafraichie, va etablir une nouvelle connexion...
-        }
+            const newSocket = io(`http://${window.location.hostname}:4000`) 
+            console.log(`connected to: http://${window.location.hostname}:4000`)
+            newSocket.on('new-game-state', (gameState) => {
+                console.log('new game state: ', gameState)
+            })
+            setSocket(newSocket)
+            
+            return () => {
+                newSocket.close() // si la page rafraichie, va etablir une nouvelle connexion...
+            }
         }
     }, [connect, setSocket])
 
@@ -43,7 +47,9 @@ function Main(props) {
         }
         console.log(`player ${playerId} played card ${playedCardValue} on pile ${selectedPileId}`)
 
-        // emit here
+        const action = new PlayerAction(playerId, playedCardValue)
+
+        socket.emit('player-action', action)
     }
 
     return ( 
