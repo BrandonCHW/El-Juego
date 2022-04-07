@@ -15,8 +15,7 @@ function Main(props) {
     const [selectedPlayedTwoCard, setSelectedPlayedTwoCard] = useState()
     const [playerOneCards, setPlayerOneCards] = useState(['1','2','3','97','98','99'])
     const [playerTwoCards, setPlayerTwoCards] = useState(['1','2','3','97','98','99'])
-    let state = new GameState()
-    const [gameState, setGameState] = useState(state)
+    const [gameState, setGameState] = useState(new GameState())
         
     const [connect, setConnect] = useState(false)
     const [socket, setSocket] = useState(null)
@@ -55,20 +54,27 @@ function Main(props) {
 
         const action = new PlayerAction(playerId, playedCardValue, selectedPileId)
 
-        socket.emit('player-action', action)
+        if (socket) {
+            socket.emit('player-action', action)
+        }
+    }
+
+    const HandleNewGameState = (state) => {
+        console.log(state)
+        setGameState(state)
     }
 
     return ( 
         <>
             <div className="Main">
-            <DevTools></DevTools>
+            <DevTools OnNewGameState={(state) => HandleNewGameState(state)}></DevTools>
                 <h2>El Juego</h2>
-                <CenterBoard 
+                <CenterBoard
+                    piles={gameState.piles}
                     onSelectPile={(id) => {
                         console.log('change pile to: ', id)
                         setSelectedPileId(id)
-                    }
-                }/>
+                    }}/>
                 <div>
                     <PlayerHand name="Player1" hand={playerOneCards} onPlay={(value) => handlePlayCard(1, value)}/>
                     <Button onClick={() => connectToServer()}>P1 connect</Button>
@@ -85,7 +91,6 @@ function Main(props) {
             </div> 
         </>
     );
-    
 }
     
-    export default Main;
+export default Main;

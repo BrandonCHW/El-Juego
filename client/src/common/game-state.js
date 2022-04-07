@@ -1,13 +1,7 @@
-// let GameState = function(hands = [], centerBoard = [], drawPile = []) {
-//   this.hands = hands
-//   this.centerBoard = centerBoard
-//   this.drawPile = drawPile
-// }
-
 class GameState {  
-  constructor(hands = [], centerBoard = [], drawPile = []) {
+  constructor(hands = [], piles = [], drawPile = []) {
       this.hands = hands
-      this.centerBoard = centerBoard
+      this.piles = piles // TODO changer en []
       this.drawPile = drawPile
   }
 }
