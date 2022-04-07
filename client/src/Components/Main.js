@@ -13,8 +13,8 @@ function Main(props) {
     const [selectedPileId, setSelectedPileId] = useState()
     const [selectedPlayedOneCard, setSelectedPlayedOneCard] = useState()
     const [selectedPlayedTwoCard, setSelectedPlayedTwoCard] = useState()
-    const [playerOneCards, setPlayerOneCards] = useState(['1','2','3','97','98','99'])
-    const [playerTwoCards, setPlayerTwoCards] = useState(['1','2','3','97','98','99'])
+    const [playerOneCards, setPlayerOneCards] = useState([0,0,0,0,0,0])
+    const [playerTwoCards, setPlayerTwoCards] = useState([0,0,0,0,0,0])
     const [gameState, setGameState] = useState(new GameState())
         
     const [connect, setConnect] = useState(false)
@@ -28,6 +28,7 @@ function Main(props) {
             // events
             newSocket.on('new-game-state', (gameState) => {
                 console.log('new game state: ', gameState)
+                setGameState(gameState)
             })
 
             setSocket(newSocket)
@@ -59,7 +60,7 @@ function Main(props) {
         }
     }
 
-    const HandleNewGameState = (state) => {
+    const HandleManualNewGameState = (state) => {
         console.log(state)
         setGameState(state)
     }
@@ -67,10 +68,10 @@ function Main(props) {
     return ( 
         <>
             <div className="Main">
-            <DevTools OnNewGameState={(state) => HandleNewGameState(state)}></DevTools>
+            <DevTools OnNewGameState={(state) => HandleManualNewGameState(state)}></DevTools>
                 <h2>El Juego</h2>
                 <CenterBoard
-                    piles={gameState.piles}
+                    piles={gameState.piles ?? []}
                     onSelectPile={(id) => {
                         console.log('change pile to: ', id)
                         setSelectedPileId(id)

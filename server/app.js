@@ -35,17 +35,11 @@ io.on('connection', (socket) => {
   })
 
   socket.on('player-action', (action) => {
-    console.log(action) // PlayerAction
+    const newGameState = updateGame(action)
 
-    socket.emit("new-game-state", { hello: 'yo' })
+    socket.emit("new-game-state", newGameState)
   })
 
-  socket.on('player-action', (action) => {
-    console.log(action) // PlayerAction
-
-    socket.emit("new-game-state", { hello: 'yo' })
-  })
-  
   /*********** dev-tools ***********/
   socket.on('start-game', () => {    
     initNewGame()
@@ -68,21 +62,37 @@ io.on('connection', (socket) => {
 })
 
 server.listen(PORT, () => {
-  console.log(`el-juego-backend: listening on *:${PORT}`)
+  console.log(`El-juego-backend - Listening on *:${PORT}`)
 })
 
+/**
+ * todos
+ * 1- validate action fields
+ * 2- validate game exists
+ * @param {*} action 
+ * @returns the new state of the game
+ */
 const updateGame = (action) => {
+  if (games[0]) {
+    var currentGame = games[0]
+    var cardPlayed = action.cardPlayed
+    var pileId = action.pileId
 
-  var newHands = action.hands
-  return new GameState()
+    currentGame.piles[pileId] = cardPlayed
+    games[0] = currentGame // ??
+
+    return games[0]
+  } else {
+    console.log("can't update game: no games.")
+  }
 }
 
 const initNewGame = () => {
   // todo enlever
   if (games.length == 0) {
     const hands = [
-      ['9','2','3','4','5','6'],
-      ['7','8','10','11','36','56'],
+      [2,3,4,5,6,7],
+      [68,67,66,65,64,32],
     ]
     const piles = [1, 100, 1, 100]
     const drawPile = []
@@ -90,6 +100,6 @@ const initNewGame = () => {
     games.push(new GameState(hands, piles, drawPile))
     console.log('Creating new game... games: ', games.length)    
   } else {
-    console.log('game exists already...')
+    console.log('Game exists already...')
   }
 }

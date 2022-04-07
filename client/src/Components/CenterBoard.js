@@ -24,15 +24,15 @@ function CenterBoard(props) {
         <Card
           key={1}
           value={piles[0] ?? ''}
-          onClick={(event) => handleClick(event, { key: 1, value: 1 })}
-          isSelectedCard={selectedCard.key === 1}
+          onClick={(event) => handleClick(event, { key: 0, value: 1 })}
+          isSelectedCard={selectedCard.key === 0}
           isCenterCard
         />
         <Card
           key={2}
           value={piles[1] ?? ''}
-          onClick={(event) => handleClick(event, { key: 2, value: 100 })}
-          isSelectedCard={selectedCard.key === 2}
+          onClick={(event) => handleClick(event, { key: 1, value: 100 })}
+          isSelectedCard={selectedCard.key === 1}
           isCenterCard
         />{" "}
         <small>Pile 2 (DOWN)</small>
@@ -42,15 +42,15 @@ function CenterBoard(props) {
         <Card
           key={3}
           value={piles[2] ?? ''}
-          onClick={(event) => handleClick(event, { key: 3, value: 1 })}
-          isSelectedCard={selectedCard.key === 3}
+          onClick={(event) => handleClick(event, { key: 2, value: 1 })}
+          isSelectedCard={selectedCard.key === 2}
           isCenterCard
         />
         <Card
           key={4}
           value={piles[3] ?? ''}
-          onClick={(event) => handleClick(event, { key: 4, value: 100 })}
-          isSelectedCard={selectedCard.key === 4}
+          onClick={(event) => handleClick(event, { key: 3, value: 100 })}
+          isSelectedCard={selectedCard.key === 3}
           isCenterCard
         />{" "}
         <small>Pile 4 (DOWN)</small>
