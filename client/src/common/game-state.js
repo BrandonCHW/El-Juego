@@ -4,6 +4,8 @@ class GameState {
       this.piles = piles // TODO changer en []
       this.drawPile = drawPile
   }
+
+  // todo maybe do a diff-merge method??
 }
 
 module.exports = GameState

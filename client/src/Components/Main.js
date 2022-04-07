@@ -11,10 +11,6 @@ import GameState from '../common/game-state';
 function Main(props) {
     // 1 state per values that tend to change together
     const [selectedPileId, setSelectedPileId] = useState()
-    const [selectedPlayedOneCard, setSelectedPlayedOneCard] = useState()
-    const [selectedPlayedTwoCard, setSelectedPlayedTwoCard] = useState()
-    const [playerOneCards, setPlayerOneCards] = useState([0,0,0,0,0,0])
-    const [playerTwoCards, setPlayerTwoCards] = useState([0,0,0,0,0,0])
     const [gameState, setGameState] = useState(new GameState())
         
     const [connect, setConnect] = useState(false)
@@ -48,12 +44,6 @@ function Main(props) {
         if (!socket) {
             console.log("Can't play card: you are not connected lol")
         } else {
-            if (playerId === 1) {
-                setSelectedPlayedOneCard(playedCardValue)
-            }
-             else if (playerId === 2) {
-                setSelectedPlayedTwoCard(playedCardValue)
-            }
             console.log(`player ${playerId} played card ${playedCardValue} on pile ${selectedPileId}`)
     
             const action = new PlayerAction(playerId, playedCardValue, selectedPileId)
@@ -83,7 +73,7 @@ function Main(props) {
                         setSelectedPileId(id)
                     }}/>
                 <div>
-                    <PlayerHand name="Player1" hand={gameState?.hands[0] ?? playerOneCards} onPlay={(value) => handlePlayCard(1, value)}/>
+                    <PlayerHand name="Player1" hand={gameState?.hands[0] ?? [0,0,0,0,0,0]} onPlay={(value) => handlePlayCard(0, value)}/>
                     <Button onClick={() => connectToServer()}>P1 connect</Button>
                     { connect ? 
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" className="bi bi-check" viewBox="0 0 16 16" color='lightgreen'>
@@ -93,7 +83,7 @@ function Main(props) {
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" className="bi bi-x" viewBox="0 0 16 16" color='red'>
                         <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
                     </svg> }
-                    <PlayerHand name="Player2" hand={gameState?.hands[1] ?? playerTwoCards} onPlay={(value) => handlePlayCard(2, value)}/>
+                    <PlayerHand name="Player2" hand={gameState?.hands[1] ?? [0,0,0,0,0,0]} onPlay={(value) => handlePlayCard(1, value)}/>
                 </div>
             </div> 
         </>

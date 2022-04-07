@@ -38,6 +38,8 @@ io.on('connection', (socket) => {
   socket.on('player-action', (action) => {
     const newGameState = updateGame(action)
 
+    console.log('sending new game: ', games[0])
+
     socket.emit("new-game-state", newGameState)
   })
 
@@ -45,9 +47,9 @@ io.on('connection', (socket) => {
   socket.on('start-game', () => {    
     initNewGame()
 
-    if (games[0])
-      console.log('sending new game: ', games[0])
+    if (games[0]) {
       socket.emit('new-game-state', games[0])
+    }
   })
 
   socket.on('stop-game', () => {    
@@ -67,6 +69,7 @@ server.listen(PORT, () => {
 })
 
 /**
+ * Updates the game state when a player makes an action
  * todos
  * 1- validate action fields
  * 2- validate game exists
@@ -75,10 +78,22 @@ server.listen(PORT, () => {
  */
 const updateGame = (action) => {
   if (games[0]) {
-    var cardPlayed = action.cardPlayed
-    var pileId = action.pileId
+    // place the card on top of the selected center pile
+    games[0].piles[action.pileId] = action.cardPlayed
 
-    games[0].piles[pileId] = cardPlayed
+    //remove card from player's hand
+    var hand = games[0].hands[action.playerId]
+    hand = hand.filter(card => card != action.cardPlayed)
+
+    //give player a new card from the draw pile
+    var newCard = _.sample(games[0].drawPile)
+    var drawPile = games[0].drawPile
+    hand.push(newCard)
+    games[0].hands[0] = hand
+
+    // remove card from draw pile
+    drawPile = drawPile.filter(card => card != newCard)
+    games[0].drawPile = drawPile
 
     return games[0]
   } else {
