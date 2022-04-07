@@ -42,7 +42,7 @@ function Main(props) {
 
     const connectToServer = () => {
         setConnect(!connect)
-      }
+    }
     
     const handlePlayCard = (playerId, playedCardValue) => {
         if (!socket) {

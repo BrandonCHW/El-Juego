@@ -5,7 +5,8 @@ const cors = require('cors')
 const http = require('http')
 const server = http.createServer(app)
 const { Server } = require("socket.io")
-const { emit } = require('process')
+
+const _ = require('lodash')
 
 // TODO Move to shared
 const GameState = require('../client/src/common/game-state')
@@ -87,16 +88,20 @@ const updateGame = (action) => {
   }
 }
 
+/************ GAME STATE UPDATES ***************/
+// todo extract to file
 const initNewGame = () => {
   // todo enlever
   if (games.length == 0) {
-    const hands = [
-      [2,3,4,5,6,7],
-      [68,67,66,65,64,32],
-    ]
     const piles = [1, 100, 1, 100]
-    const drawPile = []
-  
+    var drawPile = _.range(2,99)
+    var hands = []
+    hands.push(_.sampleSize(drawPile, 6)) // draw 6 cards for x players
+    drawPile = drawPile.filter(card => !hands[0].includes(card))
+
+    hands.push(_.sampleSize(drawPile, 6)) // draw 6 cards for x players
+    drawPile = drawPile.filter(card => !hands[1].includes(card))    
+      
     games.push(new GameState(hands, piles, drawPile))
     console.log('Creating new game... games: ', games.length)    
   } else {
