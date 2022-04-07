@@ -6,6 +6,10 @@ import io from 'socket.io-client'
 function PlayerHand(props) {
   const [selectedCard, setSelectedCard] = useState({ key: -1, value: 0 });
 
+  useEffect(() => {
+    setSelectedCard({key: -1, value: 0})
+  }, [props.hand])
+  
   const handleClick = (event, card) => {
     setSelectedCard(card);
     console.log('selected new card: ', card)

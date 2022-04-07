@@ -38,8 +38,6 @@ io.on('connection', (socket) => {
   socket.on('player-action', (action) => {
     const newGameState = updateGame(action)
 
-    console.log('sending new game: ', games[0])
-
     socket.emit("new-game-state", newGameState)
   })
 
@@ -78,22 +76,27 @@ server.listen(PORT, () => {
  */
 const updateGame = (action) => {
   if (games[0]) {
+    console.log(action)
     // place the card on top of the selected center pile
     games[0].piles[action.pileId] = action.cardPlayed
 
     //remove card from player's hand
     var hand = games[0].hands[action.playerId]
+    console.log('before hand: ', hand)
     hand = hand.filter(card => card != action.cardPlayed)
+    console.log('after hand: ', hand)
 
     //give player a new card from the draw pile
-    var newCard = _.sample(games[0].drawPile)
     var drawPile = games[0].drawPile
+    var newCard = _.sample(drawPile)
     hand.push(newCard)
     games[0].hands[0] = hand
 
     // remove card from draw pile
     drawPile = drawPile.filter(card => card != newCard)
     games[0].drawPile = drawPile
+
+    console.log('final hand: ', games[0].hands[0])
 
     return games[0]
   } else {
@@ -109,10 +112,10 @@ const initNewGame = () => {
     const piles = [1, 100, 1, 100]
     var drawPile = _.range(2,99)
     var hands = []
-    hands.push(_.sampleSize(drawPile, 6)) // draw 6 cards for x players
+    hands.push(_.sampleSize(drawPile, 6)) // player 1, 6 cards for now...
     drawPile = drawPile.filter(card => !hands[0].includes(card))
 
-    hands.push(_.sampleSize(drawPile, 6)) // draw 6 cards for x players
+    hands.push(_.sampleSize(drawPile, 6)) // player 2, 6 cards for now...
     drawPile = drawPile.filter(card => !hands[1].includes(card))    
       
     games.push(new GameState(hands, piles, drawPile))
