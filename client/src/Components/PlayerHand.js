@@ -12,7 +12,7 @@ function PlayerHand(props) {
   };
 
   const handlePlayCard = () => {
-    if (selectedCard.key <= 0) {
+    if (selectedCard.key < 0) {
       console.log("nothing to play. please select a card");
     } else {
       props.onPlay(selectedCard.value);

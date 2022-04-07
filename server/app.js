@@ -75,12 +75,10 @@ server.listen(PORT, () => {
  */
 const updateGame = (action) => {
   if (games[0]) {
-    var currentGame = games[0]
     var cardPlayed = action.cardPlayed
     var pileId = action.pileId
 
-    currentGame.piles[pileId] = cardPlayed
-    games[0] = currentGame // ??
+    games[0].piles[pileId] = cardPlayed
 
     return games[0]
   } else {
