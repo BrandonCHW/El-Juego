@@ -23,7 +23,7 @@ function Main(props) {
     useEffect(() => {
         if (connect) {
             const newSocket = io(`http://${window.location.hostname}:4000`) 
-            console.log(`connected to: http://${window.location.hostname}:4000`)
+            console.log(`player 1 connected to: http://${window.location.hostname}:4000`)
 
             // events
             newSocket.on('new-game-state', (gameState) => {
@@ -37,9 +37,12 @@ function Main(props) {
                 newSocket.close() // si la page rafraichit, va etablir une nouvelle connexion...
             }
         }
+    }, [connect,setSocket])
+
+    useEffect(() => {        
         if (connect2) {
             const newSocket2 = io(`http://${window.location.hostname}:4000`) 
-            console.log(`connected to: http://${window.location.hostname}:4000`)
+            console.log(`player 2 connected to: http://${window.location.hostname}:4000`)
             
             newSocket2.on('new-game-state', (gameState) => {
                 console.log('new game state: ', gameState)
@@ -52,30 +55,27 @@ function Main(props) {
                 newSocket2.close() // si la page rafraichit, va etablir une nouvelle connexion...
             }
         }
-    }, [connect, connect2, setSocket2, setSocket])
-
+    }, [ connect2, setSocket2, ])
 
     const connectToServer = () => {
-        console.log('player 1 connects')
+        console.log('player 1', connect ? "disconnects" : "connects")
         setConnect(!connect)
     }
     
     const connectToServer2 = () => {
-        console.log('player 2 connects')
+        console.log('player 2', connect2 ? "disconnects" : "connects")
         setConnect2(!connect2)
     }
     
-    const handlePlayCard = (playerId, playedCardValue) => {
-        if (!socket) {
+    const handlePlayCard = (playerSocket, playerId, playedCardValue) => {
+        if (!playerSocket) {
             console.log("Can't play card: you are not connected lol")
         } else {
             console.log(`player ${playerId} played card ${playedCardValue} on pile ${selectedPileId}`)
     
             const action = new PlayerAction(playerId, playedCardValue, selectedPileId)
     
-            if (socket) {
-                socket.emit('player-action', action)
-            }
+            playerSocket.emit('player-action', action)
         }
     }
 
@@ -98,7 +98,7 @@ function Main(props) {
                         setSelectedPileId(id)
                     }}/>
                 <div>
-                    <PlayerHand name="Player1" hand={gameState?.hands[0] ?? [0,0,0,0,0,0]} onPlay={(value) => handlePlayCard(0, value)}/>
+                    <PlayerHand name="Player1" hand={gameState?.hands[0] ?? [0,0,0,0,0,0]} onPlay={(value) => handlePlayCard(socket, 0, value)}/>
                     <Button onClick={() => connectToServer()}>P1 connect</Button>
                     { connect ? 
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" className="bi bi-check" viewBox="0 0 16 16" color='lightgreen'>
@@ -109,7 +109,7 @@ function Main(props) {
                         <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
                     </svg> }
 
-                    <PlayerHand name="Player2" hand={gameState?.hands[1] ?? [0,0,0,0,0,0]} onPlay={(value) => handlePlayCard(1, value)}/>
+                    <PlayerHand name="Player2" hand={gameState?.hands[1] ?? [0,0,0,0,0,0]} onPlay={(value) => handlePlayCard(socket2, 1, value)}/>
                     <Button onClick={() => connectToServer2()}>P2 connect</Button>
                     { connect2 ? 
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" className="bi bi-check" viewBox="0 0 16 16" color='lightgreen'>

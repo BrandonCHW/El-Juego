@@ -7,7 +7,7 @@ function DevTools(props) {
   const [socket, setSocket] = useState(null)
 
   useEffect(() => {
-    const newSocket = io("http://localhost:4000")
+    const newSocket = io("http://localhost:4000/devtools")
     setSocket(newSocket)
     setConnect(true)
     
@@ -22,13 +22,13 @@ function DevTools(props) {
       newSocket.close()
       console.log('dev tools disconnected from backend')
     }
-  },[props, setSocket])
+  },[setSocket])
 
   return (
     <>
       <div>DevTools</div>
-      <Button onClick={() => socket.emit('start-game')}>Start Game</Button>   
-      <Button onClick={() => socket.emit('stop-game')}>Stop Game</Button>   
+      <Button onClick={() => socket.emit('dev-start-game')}>Start Game</Button>   
+      <Button onClick={() => socket.emit('dev-stop-game')}>Stop Game</Button>   
       { connect ? 
       <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" className="bi bi-check" viewBox="0 0 16 16" color='lightgreen'>
           <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>

@@ -54,15 +54,10 @@ devToolsNamespace.on('connection', (socket) => {
 })
 
 io.on('connection', (socket) => {
-  console.log('a new user has connected. ID: ', socket.id)
+  lobbies[0].addPlayer(socket.id, 'default_name')
 
   var room = "room1"
   socket.join(room);
-  console.log(`user ${socket.id} joined room: ${room}`)
-
-  socket.on('disconnect', () => {
-    console.log('a user has disconnected')
-  })
 
   socket.on('player-action', (action) => {
     const newGameState = updateGame(action)
@@ -70,6 +65,10 @@ io.on('connection', (socket) => {
     socket.emit("new-game-state", newGameState)
   })
   
+  socket.on('disconnect', () => {
+    console.log('a user has disconnected')
+    lobbies[0].removePlayer(socket.id)
+  })
 })
 
 server.listen(PORT, () => {
