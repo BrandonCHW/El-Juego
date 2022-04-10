@@ -11,6 +11,7 @@ const _ = require('lodash')
 // TODO Move to shared
 const GameState = require('../client/src/common/game-state')
 const PlayerAction = require('../client/src/common/player-action')
+const Lobby = require('../client/src/common/lobby')
 
 
 const io = new Server(server, {
@@ -18,18 +19,46 @@ const io = new Server(server, {
     origin: "http://localhost:3000"
   }
 })
+const devToolsNamespace = io.of('/devtools')
 
 const PORT = 4000
 
+var lobbies = [new Lobby()]
 var games = []
 
 app.get('/', (req,res) => {
   res.sendFile(__dirname + '/socketiotest.html')
 })
 
-io.on('connection', (socket) => {
-  console.log('a new user has connected')
+devToolsNamespace.on('connection', (socket) => {
+  console.log('dev tools connected')
 
+  socket.on('dev-start-game', () => {    
+    initNewGame()
+
+    if (games[0]) {
+      socket.emit('new-game-state', games[0])
+    }
+  })
+
+  socket.on('dev-stop-game', () => {    
+    if (games.length > 0) {
+      games = []
+
+      console.log("Deleting all games... games: ", games.length)
+      socket.emit('new-game-state', new GameState())
+    } else {
+      console.log('No games!')
+    }
+  })
+})
+
+io.on('connection', (socket) => {
+  console.log('a new user has connected. ID: ', socket.id)
+
+  var room = "room1"
+  socket.join(room);
+  console.log(`user ${socket.id} joined room: ${room}`)
 
   socket.on('disconnect', () => {
     console.log('a user has disconnected')
@@ -40,26 +69,7 @@ io.on('connection', (socket) => {
 
     socket.emit("new-game-state", newGameState)
   })
-
-  /*********** dev-tools ***********/
-  socket.on('start-game', () => {    
-    initNewGame()
-
-    if (games[0]) {
-      socket.emit('new-game-state', games[0])
-    }
-  })
-
-  socket.on('stop-game', () => {    
-    if (games.length > 0) {
-      games = []
-
-      console.log("Deleting all games... games: ", games.length)
-      socket.emit('new-game-state', new GameState())
-    } else {
-      console.log('No games!')
-    }
-  })
+  
 })
 
 server.listen(PORT, () => {
