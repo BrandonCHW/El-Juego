@@ -9,7 +9,7 @@ class PlayerAction {
    * @param {*} pileId id of the pile (1-4)
    */
   constructor(playerId, cardPlayed, pileId) {
-    this.playerId = playerId
+    this.playerId = playerId // todo move to gamestate / lobby
     this.cardPlayed = cardPlayed
     this.pileId = pileId
   }   
