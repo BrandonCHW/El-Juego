@@ -12,7 +12,20 @@ class PlayerAction {
     this.playerId = playerId // todo move to gamestate / lobby
     this.cardPlayed = cardPlayed
     this.pileId = pileId
-  }   
+  }
+
+  static Create(action) {
+    return new PlayerAction(action.playerId, action.cardPlayed, action.pileId)
+  }
+
+  isValid() {
+    console.log(this)
+    return this.playerId >= 0 
+        && this.cardPlayed > 1 
+        && this.cardPlayed < 100
+        && this.pileId >= 0
+        && this.pileId <= 3
+  }
 }
 
 module.exports = PlayerAction
