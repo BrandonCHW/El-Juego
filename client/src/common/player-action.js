@@ -20,7 +20,7 @@ class PlayerAction {
 
   isValid() {
     console.log(this)
-    return this.playerId >= 0 
+    return this.playerId !== ''
         && this.cardPlayed > 1 
         && this.cardPlayed < 100
         && this.pileId >= 0

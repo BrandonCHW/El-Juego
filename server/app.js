@@ -33,6 +33,7 @@ app.get('/', (req,res) => {
   res.sendFile(__dirname + '/socketiotest.html')
 })
 
+/****************** DEV-TOOLS ***************/
 devToolsNamespace.on('connection', (socket) => {
   console.log('dev tools connected')
 
@@ -52,8 +53,11 @@ devToolsNamespace.on('connection', (socket) => {
   })
 })
 
+/****************** PLAYERS ***************/
 io.on('connection', (socket) => {
-  lobbies[0].addPlayer(socket.id, 'default_name')
+  const uid = (Math.random() + 1).toString(36).substring(7)
+  lobbies[0].addPlayer(socket.id, 'default_name', uid)
+  io.to(socket.id).emit('get-uid', uid)
 
   var room = "room1"
   socket.join(room);
@@ -83,37 +87,43 @@ io.on('connection', (socket) => {
  * @returns the new state of the game
  */
 const updateGame = (socket, action) => {
-  if (!lobbies[0].gameState) {
+  var gameState = lobbies[0].gameState
+
+  if (!gameState) {
     console.log("can't update game: no games.")
   } else {
     if (!isValidAction(action)) {
       console.log("THIS ACTION IS INVALID!!!!!!!!!")
-      return lobbies[0].gameState // defaults to returning the current game state
+      return gameState // defaults to returning the current game state
     } else {
       // place the card on top of the selected center pile
-      lobbies[0].gameState.piles[action.pileId] = action.cardPlayed
+      gameState.setPile(action.pileId, action.cardPlayed)
       
       // checkIfGameIsOver(lobbies[0].gameState)
 
       //remove card from player's hand
-      var hand = lobbies[0].gameState.hands[action.playerId]
-      hand = hand.filter(card => card != action.cardPlayed)
+      var hand = gameState.getHand(action.playerId)
+      console.log('hand1: ', gameState.hands[0].cards)
+      console.log('hand2: ', gameState.hands[1].cards)
+      console.log('hand before: ', hand)
+      hand.cards = hand.cards.filter(card => card != action.cardPlayed)
+      console.log('hand after: ', hand)
 
       //give player a new card from the draw pile (if not empty)
-      var drawPile = lobbies[0].gameState.drawPile
+      var drawPile = gameState.drawPile
       if (drawPile.length > 0) {
         var newCard = _.sample(drawPile)
-        hand.push(newCard)
+        hand.cards.push(newCard)
 
         // remove card from draw pile
         drawPile = drawPile.filter(card => card != newCard)
-        lobbies[0].gameState.drawPile = drawPile
+        gameState.drawPile = drawPile
       }
 
       // save
-      lobbies[0].gameState.hands[action.playerId] = hand
+      // gameState.hands[action.playerId] = hand
 
-      return lobbies[0].gameState
+      return gameState
     }
   }
 }
@@ -124,13 +134,17 @@ const initNewGame = () => {
   const piles = [1, 100, 1, 100]
   var drawPile = _.range(2,99)
   var hands = []
-  hands.push(_.sampleSize(drawPile, 6)) // player 1, 6 cards for now...
-  drawPile = drawPile.filter(card => !hands[0].includes(card))
+  lobbies[0].players.forEach(player => {
+    const drawnCards = _.sampleSize(drawPile, 6)
+    drawPile = drawPile.filter(card => !drawnCards.includes(card))
+    hands.push({
+      uid: player.uid, 
+      cards: drawnCards
+    })
+  })
 
-  hands.push(_.sampleSize(drawPile, 6)) // player 2, 6 cards for now...
-  drawPile = drawPile.filter(card => !hands[1].includes(card))    
-        
-  lobbies[0].gameState = new GameState(hands, piles, drawPile)
+  const firstToPlayUid = lobbies[0].players[0].uid //player 1 starts by default...
+  lobbies[0].gameState = new GameState(hands, piles, drawPile, firstToPlayUid)
   console.log('Creating new game...')    
 }
 /**
@@ -161,11 +175,22 @@ const checkIfGameIsOver = (gameState) => {
 const isValidAction = (action) => {
   var valid = true
 
+  // Action form is not valid
   if (!action.isValid()) {
     console.log('The action form is invalid')
     valid = false
   }
-  // Ascending piles
+  // Player is not registered in the lobby
+  if (!lobbies[0].players.filter(p => p.uid === action.playerId).length > 0) {
+    console.log(`The player with id ${action.playerId} is not found in this lobby.`)
+    valid = false
+  }
+  // It is not the player's turn
+  else if (action.playerId != lobbies[0].gameState.turn) {
+    console.log(`It is not this player's turn to play (turn: ${lobbies[0].gameState.turn}). Action canceled`)
+    valid = false
+  }
+  // Check if card can be played on ASCENDING piles
   else if (action.pileId == 0 || action.pileId === 2) {
     var pileCard = lobbies[0].gameState.piles[action.pileId]
     if (pileCard > action.cardPlayed && action.cardPlayed != pileCard - 10) { // +10 rule
@@ -173,7 +198,7 @@ const isValidAction = (action) => {
       valid = false
     }
   }
-  // Descending piles
+  // Check if card can be played on DESCENDING piles
   else if (action.pileId == 1 || action.pileId == 3) {
     var pileCard = lobbies[0].gameState.piles[action.pileId]
     if (pileCard < action.cardPlayed && action.cardPlayed != pileCard + 10) { // -10 rule
