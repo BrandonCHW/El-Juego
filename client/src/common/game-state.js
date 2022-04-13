@@ -14,13 +14,6 @@ class GameState {
     return hand.cards.length > 0 ? hand.cards : {}
   }
 
-  setHand(uid, cards) {
-    const hand = this.hands.find(x => x.uid === uid)
-    if (hand) {
-      hand.cards = cards
-    }
-  }
-
   // ascending
   get pileOne() { return this.piles[0] ?? '0' }
 

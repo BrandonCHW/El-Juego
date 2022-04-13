@@ -111,7 +111,7 @@ const updateGame = (socket, action) => {
       if (drawPile.length > 0) {
         var newCard = _.sample(drawPile)
         newHand.push(newCard)
-        gameState.setHand(action.playerId, newHand)
+        hand.cards = newHand
 
         // remove card from draw pile
         drawPile = drawPile.filter(card => card != newCard)
