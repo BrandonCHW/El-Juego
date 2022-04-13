@@ -11,7 +11,14 @@ class GameState {
   // todo find a better way to find a player's hand
   getHand(uid) {
     const hand = this.hands.find(x => x.uid === uid)
-    return hand.length > 0 ? hand[0] : {}
+    return hand.cards.length > 0 ? hand.cards : {}
+  }
+
+  setHand(uid, cards) {
+    const hand = this.hands.find(x => x.uid === uid)
+    if (hand) {
+      hand.cards = cards
+    }
   }
 
   // ascending

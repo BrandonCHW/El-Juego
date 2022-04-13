@@ -88,6 +88,7 @@ io.on('connection', (socket) => {
  */
 const updateGame = (socket, action) => {
   var gameState = lobbies[0].gameState
+  var players = lobbies[0].players
 
   if (!gameState) {
     console.log("can't update game: no games.")
@@ -103,18 +104,25 @@ const updateGame = (socket, action) => {
 
       //remove card from player's hand
       var hand = gameState.getHand(action.playerId)
-      hand.cards = hand.cards.filter(card => card != action.cardPlayed)
+      var newHand = hand.filter(card => card != action.cardPlayed)
 
       //give player a new card from the draw pile (if not empty)
       var drawPile = gameState.drawPile
       if (drawPile.length > 0) {
         var newCard = _.sample(drawPile)
-        hand.cards.push(newCard)
+        newHand.push(newCard)
+        gameState.setHand(action.playerId, newHand)
 
         // remove card from draw pile
         drawPile = drawPile.filter(card => card != newCard)
         gameState.drawPile = drawPile
       }
+
+      // change player turn (round robin)
+      const currentIndex = players.findIndex(player => player.uid == action.playerId)
+      gameState.turn = players[(currentIndex + 1) % players.length].uid
+
+      console.log('new game state:', gameState)
 
       return gameState
     }
@@ -136,7 +144,7 @@ const initNewGame = () => {
     })
   })
 
-  const firstToPlayUid = lobbies[0].players[0].uid //player 1 starts by default...
+  const firstToPlayUid = lobbies[0].players[0].uid // first palyer registered starts by default
   lobbies[0].gameState = new GameState(hands, piles, drawPile, firstToPlayUid)
   console.log('Creating new game...')    
 }
