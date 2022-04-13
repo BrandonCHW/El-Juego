@@ -1,22 +1,18 @@
 const _ = require('lodash')
+const GameState = require('./game-state')
 
-class Lobby {
-  
-  roomName = ''
-  players = [] // {socketId: string, name?: string}
-  
-  constructor() {
+class Lobby {    
+  constructor(gameState = null) {
     this.roomName = ''
-    this.players = []
-
-    //todo add gamestate here. Lobby is superset of gamestate (1 <-> 1)
+    this.players = [] // {socketId: string, name?: string}
+    this.gameState = gameState instanceof GameState ? gameState : new GameState()
   }
 
-  addPlayer(socketId, name='')  {
+  addPlayer(socketId, name='',)  {
     if (this.players.filter(p => p.socketId === socketId).length === 0) {
       this.players.push({
         socketId: socketId,
-        name: name
+        name: name,        
       })
       console.log('New player added. Players:', this.players)
     } else {

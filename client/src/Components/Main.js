@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Main.css';
 import PlayerHand from './PlayerHand'
 import CenterBoard from './CenterBoard';
-import { Button } from 'react-bootstrap';
+import Button from 'react-bootstrap/button';
 import io from 'socket.io-client'
 import DevTools from './DevTools';
 import PlayerAction from '../common/player-action'

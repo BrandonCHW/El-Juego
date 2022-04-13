@@ -24,7 +24,6 @@ const devToolsNamespace = io.of('/devtools')
 const PORT = 4000
 
 var lobbies = [new Lobby()]
-var games = []
 
 server.listen(PORT, () => {
   console.log(`El-juego-backend - Listening on *:${PORT}`)
@@ -40,20 +39,16 @@ devToolsNamespace.on('connection', (socket) => {
   socket.on('dev-start-game', () => {    
     initNewGame()
 
-    if (games[0]) {
-      socket.emit('new-game-state', games[0])
+    if (lobbies[0].gameState) {
+      socket.emit('new-game-state', lobbies[0].gameState)
     }
   })
 
-  socket.on('dev-stop-game', () => {    
-    if (games.length > 0) {
-      games = []
+  socket.on('dev-stop-game', () => {   
+      lobbies[0].gameState = new GameState()
 
-      console.log("Deleting all games... games: ", games.length)
-      socket.emit('new-game-state', new GameState())
-    } else {
-      console.log('No games!')
-    }
+      console.log("Deleting game... ")
+      socket.emit('new-game-state', lobbies[0].gameState)
   })
 })
 
@@ -65,7 +60,6 @@ io.on('connection', (socket) => {
 
   socket.on('player-action', (playerAction) => {
     const action = PlayerAction.Create(playerAction) // reconstitute prototype.. how?
-    console.log('ACTION', action)
 
     const newGameState = updateGame(socket.id, action)
 
@@ -89,35 +83,37 @@ io.on('connection', (socket) => {
  * @returns the new state of the game
  */
 const updateGame = (socket, action) => {
-  if (!games[0]) {
+  if (!lobbies[0].gameState) {
     console.log("can't update game: no games.")
   } else {
     if (!isValidAction(action)) {
       console.log("THIS ACTION IS INVALID!!!!!!!!!")
-      return games[0] // defaults to returning the same game state
+      return lobbies[0].gameState // defaults to returning the current game state
     } else {
       // place the card on top of the selected center pile
-      games[0].piles[action.pileId] = action.cardPlayed
+      lobbies[0].gameState.piles[action.pileId] = action.cardPlayed
+      
+      // checkIfGameIsOver(lobbies[0].gameState)
 
       //remove card from player's hand
-      var hand = games[0].hands[action.playerId]
+      var hand = lobbies[0].gameState.hands[action.playerId]
       hand = hand.filter(card => card != action.cardPlayed)
 
       //give player a new card from the draw pile (if not empty)
-      var drawPile = games[0].drawPile
+      var drawPile = lobbies[0].gameState.drawPile
       if (drawPile.length > 0) {
         var newCard = _.sample(drawPile)
         hand.push(newCard)
 
         // remove card from draw pile
         drawPile = drawPile.filter(card => card != newCard)
-        games[0].drawPile = drawPile
+        lobbies[0].gameState.drawPile = drawPile
       }
 
       // save
-      games[0].hands[action.playerId] = hand
+      lobbies[0].gameState.hands[action.playerId] = hand
 
-      return games[0]
+      return lobbies[0].gameState
     }
   }
 }
@@ -125,23 +121,41 @@ const updateGame = (socket, action) => {
 /************ GAME STATE UPDATES ***************/
 // todo extract to file
 const initNewGame = () => {
-  // todo enlever
-  if (games.length == 0) {
-    const piles = [1, 100, 1, 100]
-    var drawPile = _.range(2,16)
-    drawPile.push(101, 102, -1, -2)
-    var hands = []
-    hands.push(_.sampleSize(drawPile, 6)) // player 1, 6 cards for now...
-    drawPile = drawPile.filter(card => !hands[0].includes(card))
+  const piles = [1, 100, 1, 100]
+  var drawPile = _.range(2,99)
+  var hands = []
+  hands.push(_.sampleSize(drawPile, 6)) // player 1, 6 cards for now...
+  drawPile = drawPile.filter(card => !hands[0].includes(card))
 
-    hands.push(_.sampleSize(drawPile, 6)) // player 2, 6 cards for now...
-    drawPile = drawPile.filter(card => !hands[1].includes(card))    
-      
-    games.push(new GameState(hands, piles, drawPile))
-    console.log('Creating new game... games: ', games.length)    
-  } else {
-    console.log('Game exists already...')
+  hands.push(_.sampleSize(drawPile, 6)) // player 2, 6 cards for now...
+  drawPile = drawPile.filter(card => !hands[1].includes(card))    
+        
+  lobbies[0].gameState = new GameState(hands, piles, drawPile)
+  console.log('Creating new game...')    
+}
+/**
+ * Checks if game is over (win/lose/ongoing)
+ */
+const checkIfGameIsOver = (gameState) => {
+  var isOver = true
+  var cardsInHands = _.flattenDeep(gameState.hands) // todo change: only the current player's hand
+  if (cardsInHands.length > 0) {
+    cardsInHands.forEach(card => {
+      // si une carte peut etre jouee, not over
+      if (card > gameState.pileOne 
+        || card < gameState.pileTwo
+        || card > gameState.pileThree
+        || card < gameState.pileFour
+        || card == gameState.pileOne - 10
+        || card == gameState.pileTwo + 10
+        || card == gameState.pileThree - 10
+        || card == gameState.pileFour + 10) {
+          isOver = false
+        }
+    })
   }
+  
+  return isOver
 }
 
 const isValidAction = (action) => {
@@ -153,7 +167,7 @@ const isValidAction = (action) => {
   }
   // Ascending piles
   else if (action.pileId == 0 || action.pileId === 2) {
-    var pileCard = games[0].piles[action.pileId]
+    var pileCard = lobbies[0].gameState.piles[action.pileId]
     if (pileCard > action.cardPlayed && action.cardPlayed != pileCard - 10) { // +10 rule
       console.log(`The card ${action.cardPlayed} cannot be played on the pile ${action.pileId}. ${pileCard} > ${action.cardPlayed}, ${pileCard} - 10 != ${action.cardPlayed}`)
       valid = false
@@ -161,7 +175,7 @@ const isValidAction = (action) => {
   }
   // Descending piles
   else if (action.pileId == 1 || action.pileId == 3) {
-    var pileCard = games[0].piles[action.pileId]
+    var pileCard = lobbies[0].gameState.piles[action.pileId]
     if (pileCard < action.cardPlayed && action.cardPlayed != pileCard + 10) { // -10 rule
       console.log(`The card ${action.cardPlayed} cannot be played on the pile ${action.pileId}. ${pileCard} < ${action.cardPlayed}, ${pileCard} + 10 != ${action.cardPlayed}`)
       valid = false

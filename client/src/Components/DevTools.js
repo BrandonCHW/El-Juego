@@ -5,6 +5,8 @@ import { io } from 'socket.io-client'
 function DevTools(props) {
   const [connect, setConnect] = useState(false)
   const [socket, setSocket] = useState(null)
+  
+  const onNewGameState = props.OnNewGameState;
 
   useEffect(() => {
     const newSocket = io("http://localhost:4000/devtools")
@@ -13,8 +15,8 @@ function DevTools(props) {
     
     newSocket.on('new-game-state', (state) => {
       console.log('NEW GAME STATE!!!')
-      props.OnNewGameState(state)
-    },[setConnect])
+      onNewGameState(state)
+    })
 
     console.log('dev tools is connected to backend')
     
@@ -22,7 +24,7 @@ function DevTools(props) {
       newSocket.close()
       console.log('dev tools disconnected from backend')
     }
-  },[setSocket])
+  },[setSocket, setConnect])
 
   return (
     <>
