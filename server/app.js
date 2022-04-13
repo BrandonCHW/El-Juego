@@ -103,11 +103,7 @@ const updateGame = (socket, action) => {
 
       //remove card from player's hand
       var hand = gameState.getHand(action.playerId)
-      console.log('hand1: ', gameState.hands[0].cards)
-      console.log('hand2: ', gameState.hands[1].cards)
-      console.log('hand before: ', hand)
       hand.cards = hand.cards.filter(card => card != action.cardPlayed)
-      console.log('hand after: ', hand)
 
       //give player a new card from the draw pile (if not empty)
       var drawPile = gameState.drawPile
@@ -119,9 +115,6 @@ const updateGame = (socket, action) => {
         drawPile = drawPile.filter(card => card != newCard)
         gameState.drawPile = drawPile
       }
-
-      // save
-      // gameState.hands[action.playerId] = hand
 
       return gameState
     }
