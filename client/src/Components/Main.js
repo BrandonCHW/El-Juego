@@ -31,7 +31,6 @@ function Main(props) {
 
       // events
       newSocket.on("new-game-state", (gameState) => {
-        console.log("new game state: ", gameState);
         setGameState(gameState);
       });
 
@@ -102,7 +101,6 @@ function Main(props) {
 
   /******* DEV-TOOLS ONLY ********/
   const HandleManualNewGameState = (state) => {
-    console.log(state);
     setGameState(state);
   };
   /*******************************/
@@ -114,7 +112,8 @@ function Main(props) {
           OnNewGameState={(state) => HandleManualNewGameState(state)}
         ></DevTools>
         <h2>El Juego</h2>
-        <h3>Current Player: '{gameState.turn}'</h3>
+        <div>Current Player: '{gameState.turn}'</div>
+        <div>Need to play: '{gameState.cardsLeftToPlay}' cards</div>
         <CenterBoard
           piles={gameState?.piles ?? []}
           onSelectPile={(id) => {
@@ -125,7 +124,7 @@ function Main(props) {
         <div>
           <PlayerHand
             name={"Player1 (" + uid1.current + ")"}
-            hand={gameState?.hands[0]?.cards ?? [0, 0, 0, 0, 0, 0]}
+            hand={gameState?.hands.find(h => h.uid === uid1.current)?.cards ?? [0, 0, 0, 0, 0, 0]}
             onPlay={(value) => handlePlayCard(socket, uid1, value)}
           />
           <Button onClick={() => connectToServer()}>P1 connect</Button>
@@ -157,7 +156,7 @@ function Main(props) {
 
           <PlayerHand
             name={"Player2 (" + uid2.current + ")"}
-            hand={gameState?.hands[1]?.cards ?? [0, 0, 0, 0, 0, 0]}
+            hand={gameState?.hands.find(h => h.uid === uid2.current)?.cards ?? [0, 0, 0, 0, 0, 0]}
             onPlay={(value) => handlePlayCard(socket2, uid2, value)}
           />
           <Button onClick={() => connectToServer2()}>P2 connect</Button>

@@ -87,6 +87,7 @@ io.on('connection', (socket) => {
  * @returns the new state of the game
  */
 const updateGame = (socket, action) => {
+  console.log(action)
   var gameState = lobbies[0].gameState
   var players = lobbies[0].players
 
@@ -103,26 +104,40 @@ const updateGame = (socket, action) => {
       // checkIfGameIsOver(lobbies[0].gameState)
 
       //remove card from player's hand
-      var hand = gameState.getHand(action.playerId)
-      var newHand = hand.filter(card => card != action.cardPlayed)
+      console.log(gameState)
+      const avant = gameState.getCards(action.playerId)
+
+      gameState.removeCard(action.playerId, action.cardPlayed)
+      const apres = gameState.getCards(action.playerId)
+
+      console.log('avant: ', avant, "apres ", apres)
 
       //give player a new card from the draw pile (if not empty)
       var drawPile = gameState.drawPile
       if (drawPile.length > 0) {
         var newCard = _.sample(drawPile)
-        newHand.push(newCard)
-        hand.cards = newHand
+        gameState.addCard(action.playerId, newCard)
 
         // remove card from draw pile
         drawPile = drawPile.filter(card => card != newCard)
         gameState.drawPile = drawPile
       }
 
-      // change player turn (round robin)
-      const currentIndex = players.findIndex(player => player.uid == action.playerId)
-      gameState.turn = players[(currentIndex + 1) % players.length].uid
+      // set number of cards left to play
+      if (gameState.cardsLeftToPlay > 0) {
+        gameState.cardsLeftToPlay -= 1
+        if (gameState.cardsLeftToPlay == 0) {
+          // change player turn (round robin)
+          const currentIndex = players.findIndex(player => player.uid == action.playerId)
+          gameState.turn = players[(currentIndex + 1) % players.length].uid
 
-      console.log('new game state:', gameState)
+          if (gameState.drawPile.length == 0) {
+            gameState.cardsLeftToPlay = 1
+          } else {
+            gameState.cardsLeftToPlay = 2
+          }
+        }
+      }
 
       return gameState
     }

@@ -14,7 +14,6 @@ function DevTools(props) {
     setConnect(true)
     
     newSocket.on('new-game-state', (state) => {
-      console.log('NEW GAME STATE!!!')
       onNewGameState(state)
     })
 
