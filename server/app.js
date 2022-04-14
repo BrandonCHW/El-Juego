@@ -215,7 +215,7 @@ const endTurn = (uid) => {
 
     // remove card from draw pile
     drawPile = drawPile.filter(card => card != newCard)
-    // gameState.drawPile = drawPile
+    gameState.drawPile = drawPile // todo necessary? seems so... is drawPile ref or value
   }
 
   // set number of cards left to play if it is this player's turn to play
@@ -233,7 +233,7 @@ const endTurn = (uid) => {
       gameState.cardsLeftToPlay = 2
     }
   } else {
-    console.log("ERROR: THERE ARE STILL CARDS TO BE PLAYED. CAN'T END")
+    console.log(`ERROR: ${gameState.turn} needs to play ${gameState.cardsLeftToPlay} cards. CAN'T END`)
   }
     
   // const isOver = checkIfGameIsOver(gameState)
