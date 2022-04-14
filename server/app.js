@@ -254,7 +254,7 @@ const endTurn = (uid) => {
  * Returns the next player's uid whose turn it is to play.
  * If no player is chosen, returns an empty string (game over)
  */
- const getNextPlayer = (uid) => {
+ const getNextPlayer = () => {
   var players = lobbies[0].players
 
   const currentIndex = players.findIndex(player => player.uid == lobbies[0].gameState.turn)

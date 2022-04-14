@@ -8,11 +8,14 @@ class GameState {
       this.cardsLeftToPlay = 2 // # of cards left to play (2: pile not empty, 1: pile empty)
   }
 
-  // Returns the players hand object
+  // Returns the players cards array
   getCards(uid) {
     const hand = this.hands.find(x => x.uid === uid)
-    
-    return hand.cards?.length > 0 ? hand.cards : []
+    if (hand) {
+      return hand.cards.length > 0 ? hand.cards : []
+    } else {
+      console.log(`Can't get cards for uid ${uid}: uid not found!`)
+    }
   }
 
   setCards(uid, cards) {
@@ -20,7 +23,7 @@ class GameState {
     if (hand) {
       hand.cards = cards
     } else {
-      console.log(`Can't set card for uid ${uid}: uid not found!`)
+      console.log(`Can't set cards for uid ${uid}: uid not found!`)
     }
   }
 
@@ -37,10 +40,7 @@ class GameState {
   removeCard(uid, card) {
     var hand = this.hands.find(x => x.uid === uid)
     if (hand) {
-      console.log("FOUND. REMOVING CARD SUCCESS FOR ", uid)
-      console.log('BEFORE: ', hand.cards)
       hand.cards = hand.cards.filter(x => x !== card)
-      console.log('AFTER: ', hand.cards)
     } else {
       console.log(`Can't remove card for uid ${uid}: uid not found!`)
     }
