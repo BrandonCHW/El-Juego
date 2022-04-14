@@ -89,7 +89,6 @@ io.on('connection', (socket) => {
 const updateGame = (socket, action) => {
   console.log(action)
   var gameState = lobbies[0].gameState
-  var players = lobbies[0].players
 
   if (!gameState) {
     console.log("can't update game: no games.")
@@ -101,16 +100,10 @@ const updateGame = (socket, action) => {
       // place the card on top of the selected center pile
       gameState.setPile(action.pileId, action.cardPlayed)
       
-      // checkIfGameIsOver(lobbies[0].gameState)
-
       //remove card from player's hand
       console.log(gameState)
-      const avant = gameState.getCards(action.playerId)
-
       gameState.removeCard(action.playerId, action.cardPlayed)
-      const apres = gameState.getCards(action.playerId)
 
-      console.log('avant: ', avant, "apres ", apres)
 
       //give player a new card from the draw pile (if not empty)
       var drawPile = gameState.drawPile
@@ -123,23 +116,44 @@ const updateGame = (socket, action) => {
         gameState.drawPile = drawPile
       }
 
-      // set number of cards left to play
-      if (gameState.cardsLeftToPlay > 0) {
+      // With this, we can let the last player play more cards until the current one plays
+      if (action.playerId != gameState.lastTurn) {
+        gameState.lastTurn = action.playerId
+      }
+
+      // set number of cards left to play if it is this player's turn to play
+      if (action.playerId == gameState.turn  && gameState.cardsLeftToPlay > 0) {
         gameState.cardsLeftToPlay -= 1
         if (gameState.cardsLeftToPlay == 0) {
-          // change player turn (round robin)
-          const currentIndex = players.findIndex(player => player.uid == action.playerId)
-          gameState.turn = players[(currentIndex + 1) % players.length].uid
-
+          // select next player
+          const nextPlayerUid = getNextPlayer()
+          if (nextPlayerUid != '') {
+            gameState.turn = nextPlayerUid
+          } else {
+            console.log("ERROR: THERE IS NO NEXT PLAYER AND GAME NOT OVER")
+          }
           if (gameState.drawPile.length == 0) {
             gameState.cardsLeftToPlay = 1
           } else {
             gameState.cardsLeftToPlay = 2
           }
-        }
+        } 
       }
 
-      return gameState
+      // const isOver = checkIfGameIsOver(gameState)
+      // if (!isOver) {
+      //   // pass turn to the next player
+      //   const nextPlayerUid = getNextPlayer()
+      //   if (nextPlayerUid != '') {
+      //     gameState.turn = nextPlayerUid
+      //   } else {
+      //     console.log("ERROR: THERE IS NO NEXT PLAYER AND GAME NOT OVER")
+      //   }
+      // } else {
+      //   // GAME OVER
+      // }
+        
+    return gameState
     }
   }
 }
@@ -168,9 +182,9 @@ const initNewGame = () => {
  */
 const checkIfGameIsOver = (gameState) => {
   var isOver = true
-  var cardsInHands = _.flattenDeep(gameState.hands) // todo change: only the current player's hand
-  if (cardsInHands.length > 0) {
-    cardsInHands.forEach(card => {
+  const hand = gameState.getCards(gameState.turn)
+  if (hand.length > 0) {
+    hand.forEach(card => {
       // si une carte peut etre jouee, not over
       if (card > gameState.pileOne 
         || card < gameState.pileTwo
@@ -188,6 +202,26 @@ const checkIfGameIsOver = (gameState) => {
   return isOver
 }
 
+/**
+ * Returns the next player's uid whose turn it is to play.
+ * If no player is chosen, returns an empty string (game over)
+ */
+const getNextPlayer = (uid) => {
+  var players = lobbies[0].players
+
+  const currentIndex = players.findIndex(player => player.uid == lobbies[0].gameState.turn)
+  
+  var nextPlayerUid = ''
+  for (var i = 1; i <= players.length && nextPlayerUid == ''; i++) {
+    const uid = players[(currentIndex + i) % players.length].uid
+    if (lobbies[0].gameState.getCards(uid).length > 0) {
+      nextPlayerUid = uid
+    }
+  }
+
+  return nextPlayerUid
+}
+
 const isValidAction = (action) => {
   var valid = true
 
@@ -202,7 +236,8 @@ const isValidAction = (action) => {
     valid = false
   }
   // It is not the player's turn
-  else if (action.playerId != lobbies[0].gameState.turn) {
+  else if (action.playerId != lobbies[0].gameState.turn 
+        && action.playerId != lobbies[0].gameState.lastTurn) {
     console.log(`It is not this player's turn to play (turn: ${lobbies[0].gameState.turn}). Action canceled`)
     valid = false
   }

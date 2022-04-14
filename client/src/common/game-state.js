@@ -1,17 +1,18 @@
 // todo make this into a getter. Move all fields to lobby
 class GameState {  
-  constructor(hands = [], piles = [], drawPile = [], turn = -1, cardsLeftToPlay = 2) {
-      this.hands = hands // { uid: string, cards: number[] } 
+  constructor(hands = [], piles = [], drawPile = [], turn = '', lastTurn = '', cardsLeftToPlay = 2) {
+      this.hands = hands // { uid: string, cards: number[] } //todo rename this to something more appropriate (cards)
       this.piles = piles // TODO changer en []
       this.drawPile = drawPile
-      this.turn = turn
+      this.turn = turn // uid of the player who's playing this turn
+      this.lastTurn = lastTurn // uid of the player who last played (can keep playing if not empty)
       this.cardsLeftToPlay = 2 // # of cards left to play (2: pile not empty, 1: pile empty)
   }
 
   // Returns the players hand object
   getCards(uid) {
     const hand = this.hands.find(x => x.uid === uid)
-    return hand.cards.length > 0 ? hand.cards : {}
+    return hand.cards.length > 0 ? hand.cards : []
   }
 
   setCards(uid, cards) {

@@ -114,6 +114,10 @@ function Main(props) {
         <h2>El Juego</h2>
         <div>Current Player: '{gameState.turn}'</div>
         <div>Need to play: '{gameState.cardsLeftToPlay}' cards</div>
+        { gameState.turn !== gameState.lastTurn && gameState.lastTurn !== '' ? 
+        <div>'{gameState.lastTurn}' can still play</div>
+        : <></>
+        }
         <CenterBoard
           piles={gameState?.piles ?? []}
           onSelectPile={(id) => {
