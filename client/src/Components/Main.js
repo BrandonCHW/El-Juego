@@ -99,6 +99,12 @@ function Main(props) {
     }
   };
 
+  const handleEndTurn = (playerSocket, uid) => {
+    if (playerSocket) {
+      playerSocket.emit('end-turn', uid)
+    }
+  }
+
   /******* DEV-TOOLS ONLY ********/
   const HandleManualNewGameState = (state) => {
     setGameState(state);
@@ -113,10 +119,10 @@ function Main(props) {
         ></DevTools>
         <h2>El Juego</h2>
         <div>Current Player: '{gameState.turn}'</div>
+        { gameState.cardsLeftToPlay === 0 ? 
+        <div>'{gameState.turn}' can still play</div>
+        : 
         <div>Need to play: '{gameState.cardsLeftToPlay}' cards</div>
-        { gameState.turn !== gameState.lastTurn && gameState.lastTurn !== '' ? 
-        <div>'{gameState.lastTurn}' can still play</div>
-        : <></>
         }
         <CenterBoard
           piles={gameState?.piles ?? []}
@@ -157,6 +163,7 @@ function Main(props) {
               <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
             </svg>
           )}
+          <Button onClick={() => handleEndTurn(socket, uid1.current)} disabled={gameState.turn!==uid1.current} variant='secondary' size='sm'>P1 End Turn</Button>
 
           <PlayerHand
             name={"Player2 (" + uid2.current + ")"}
@@ -189,6 +196,7 @@ function Main(props) {
               <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
             </svg>
           )}
+          <Button onClick={() => handleEndTurn(socket2, uid2.current)} disabled={gameState.turn!==uid2.current} variant='secondary' size='sm'>P2 End Turn</Button>
         </div>
       </div>
     </>
