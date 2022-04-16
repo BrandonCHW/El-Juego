@@ -2,7 +2,7 @@
 class GameState {  
   constructor(hands = [], piles = [], drawPile = [], turn = '', cardsLeftToPlay = 2) {
       this.hands = hands // { uid: string, cards: number[] } //todo rename this to something more appropriate (cards)
-      this.piles = piles // TODO changer en []
+      this.piles = piles
       this.drawPile = drawPile
       this.turn = turn // uid of the player who's playing this turn
       this.cardsLeftToPlay = 2 // # of cards left to play (2: pile not empty, 1: pile empty)

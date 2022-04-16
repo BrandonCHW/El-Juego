@@ -83,12 +83,10 @@ io.on('connection', (socket) => {
   })
 })
 
-
 /**
  * Updates the game state when a player makes an action
- * todos
- * 1- validate action fields
- * 2- validate game exists
+ * todo
+ * 1- validate game exists
  * @param {*} action 
  * @returns the new state of the game
  */
@@ -122,11 +120,10 @@ const updateGame = (action) => {
 // todo extract to file
 const initNewGame = () => {
   const piles = [1, 100, 1, 100]
-  var drawPile = _.range(2,8)
-  drawPile.push(97,98,99)
+  var drawPile = _.range(2,99)
   var hands = []
   lobbies[0].players.forEach(player => {
-    const drawnCards = _.sampleSize(drawPile, 2)
+    const drawnCards = _.sampleSize(drawPile, 6)
     drawPile = drawPile.filter(card => !drawnCards.includes(card))
     hands.push({
       uid: player.uid, 
