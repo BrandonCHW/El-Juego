@@ -15,12 +15,7 @@ function Main(props) {
 
   const [connect, setConnect] = useState(true);
   const [socket, setSocket] = useState(null);
-  const uid1 = useRef(0);
-
-  // temp player 2
-  const [connect2, setConnect2] = useState(true);
-  const [socket2, setSocket2] = useState(null);
-  const uid2 = useRef(0);
+  const uid = useRef(0);
 
   useEffect(() => {
     if (connect) {
@@ -34,8 +29,8 @@ function Main(props) {
         setGameState(gameState);
       });
 
-      newSocket.on("get-uid", (uid) => {
-        uid1.current = uid;
+      newSocket.on("get-uid", (playerUid) => {
+        uid.current = playerUid;
       });
 
       setSocket(newSocket);
@@ -46,31 +41,7 @@ function Main(props) {
     }
   }, [connect, setSocket]);
 
-  // todo remove this useEffect at the end of dev
-  useEffect(() => {
-    if (connect2) {
-      const newSocket2 = io(`http://${window.location.hostname}:4000`);
-      console.log(
-        `player 2 connected to: http://${window.location.hostname}:4000`
-      );
-
-      newSocket2.on("new-game-state", (gameState) => {
-        console.log("new game state: ", gameState);
-        setGameState(gameState);
-      });
-
-      newSocket2.on("get-uid", (uid) => {
-        uid2.current = uid;
-      });
-
-      setSocket2(newSocket2);
-
-      return () => {
-        newSocket2.close(); // si la page rafraichit, va etablir une nouvelle connexion...
-      };
-    }
-  }, [connect2, setSocket2]);
-
+  // todo remove this
   useEffect(() => {
     console.log("NEW STATE: ", gameState)
   },[gameState])
@@ -78,11 +49,6 @@ function Main(props) {
   const connectToServer = () => {
     console.log("player 1", connect ? "disconnects" : "connects");
     setConnect(!connect);
-  };
-
-  const connectToServer2 = () => {
-    console.log("player 2", connect2 ? "disconnects" : "connects");
-    setConnect2(!connect2);
   };
 
   const handlePlayCard = (playerSocket, uid, playedCardValue) => {
@@ -139,9 +105,9 @@ function Main(props) {
         />
         <div>
           <PlayerHand
-            name={"Player1 (" + uid1.current + ")"}
-            hand={gameState?.hands.find(h => h.uid === uid1.current)?.cards ?? [0, 0, 0, 0, 0, 0]}
-            onPlay={(value) => handlePlayCard(socket, uid1, value)}
+            name={"Player1 (" + uid.current + ")"}
+            hand={gameState?.hands.find(h => h.uid === uid.current)?.cards ?? [0, 0, 0, 0, 0, 0]}
+            onPlay={(value) => handlePlayCard(socket, uid, value)}
           />
           <Button onClick={() => connectToServer()}>P1 connect</Button>
           {connect ? (
@@ -169,7 +135,7 @@ function Main(props) {
               <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
             </svg>
           )}
-          <Button onClick={() => handleEndTurn(socket, uid1.current)} disabled={gameState.turn!==uid1.current} variant='secondary' size='sm'>P1 End Turn</Button>
+          <Button onClick={() => handleEndTurn(socket, uid.current)} disabled={gameState.turn!==uid.current} variant='secondary' size='sm'>P1 End Turn</Button>
         </div>
       </div>
     </>
