@@ -6,6 +6,7 @@ class GameState {
       this.drawPile = drawPile
       this.turn = turn // uid of the player who's playing this turn
       this.cardsLeftToPlay = 2 // # of cards left to play (2: pile not empty, 1: pile empty)
+      this.endResult = '' // "win" or "lose". "" means ongoing
   }
 
   // Returns the players cards array

@@ -94,7 +94,6 @@ io.on('connection', (socket) => {
  * @returns the new state of the game
  */
 const updateGame = (action) => {
-  console.log(action)
   var gameState = lobbies[0].gameState
 
   if (!gameState) {
@@ -108,7 +107,6 @@ const updateGame = (action) => {
       gameState.setPile(action.pileId, action.cardPlayed)
       
       //remove card from player's hand
-      console.log(gameState)
       gameState.removeCard(action.playerId, action.cardPlayed)
 
       if (gameState.cardsLeftToPlay > 0) {
@@ -116,6 +114,7 @@ const updateGame = (action) => {
       }
 
       //todo check if game is over after this action
+      checkIfGameIsOver(gameState)
     }
   }
 }
@@ -124,10 +123,11 @@ const updateGame = (action) => {
 // todo extract to file
 const initNewGame = () => {
   const piles = [1, 100, 1, 100]
-  var drawPile = _.range(2,99)
+  var drawPile = _.range(2,8)
+  drawPile.push(97,98,99)
   var hands = []
   lobbies[0].players.forEach(player => {
-    const drawnCards = _.sampleSize(drawPile, 6)
+    const drawnCards = _.sampleSize(drawPile, 2)
     drawPile = drawPile.filter(card => !drawnCards.includes(card))
     hands.push({
       uid: player.uid, 
@@ -140,10 +140,10 @@ const initNewGame = () => {
   console.log('Creating new game...')    
 }
 /**
- * Checks if game is over (win/lose/ongoing)
+ * Checks if game is over. If so, ends the game
  */
 const checkIfGameIsOver = (gameState) => {
-  var isOver = true
+  var cannotPlay = true
   const hand = gameState.getCards(gameState.turn)
   if (hand.length > 0) {
     hand.forEach(card => {
@@ -156,14 +156,31 @@ const checkIfGameIsOver = (gameState) => {
         || card == gameState.pileTwo + 10
         || card == gameState.pileThree - 10
         || card == gameState.pileFour + 10) {
-          isOver = false
+          cannotPlay = false
         }
     })
+  } 
+
+  console.log('cannot play?', cannotPlay, '. gameState.cardsLeftToPlay', gameState.cardsLeftToPlay)
+  if (cannotPlay) {
+    const allHands = _.flattenDeep(gameState.hands.map(x => x.cards))
+    if (gameState.cardsLeftToPlay > 0) {    
+      // lose
+      endGame(gameState, false)
+    } else if (allHands.length == 0) {      
+      // win
+      endGame(gameState, true)
+    }
+    // otherwise, continue playing...
   }
-  
-  return isOver
 }
 
+const endGame = (gameState, isWin) => {
+  const endResult = isWin ? 'win' : 'lose'
+  gameState.endResult = endResult
+  
+  console.log("GAME OVER. RESULT: ", endResult)
+}
 
 const isValidAction = (action) => {
   var valid = true
@@ -206,20 +223,19 @@ const isValidAction = (action) => {
 const endTurn = (uid) => {
   var gameState = lobbies[0].gameState
 
-  //give player a new card from the draw pile (if not empty)
-  var drawPile = gameState.drawPile
-  var hand = gameState.getCards(uid)
-  while (hand.length < 6 && drawPile.length > 0) { // fill 
-    var newCard = _.sample(drawPile)
-    gameState.addCard(uid, newCard)
-
-    // remove card from draw pile
-    drawPile = drawPile.filter(card => card != newCard)
-    gameState.drawPile = drawPile // todo necessary? seems so... is drawPile ref or value
-  }
-
   // set number of cards left to play if it is this player's turn to play
   if (gameState.cardsLeftToPlay == 0) {
+    //give player a new card from the draw pile (if not empty)
+    var drawPile = gameState.drawPile
+    var hand = gameState.getCards(uid)
+    while (hand.length < 6 && drawPile.length > 0) { // fill 
+      var newCard = _.sample(drawPile)
+      gameState.addCard(uid, newCard)
+
+      // remove card from draw pile
+      drawPile = drawPile.filter(card => card != newCard)
+      gameState.drawPile = drawPile // todo necessary? seems so... is drawPile ref or value
+    }
     // select next player
     const nextPlayerUid = getNextPlayer()
     if (nextPlayerUid != '') {
@@ -236,18 +252,7 @@ const endTurn = (uid) => {
     console.log(`ERROR: ${gameState.turn} needs to play ${gameState.cardsLeftToPlay} cards. CAN'T END`)
   }
     
-  // const isOver = checkIfGameIsOver(gameState)
-  // if (!isOver) {
-  //   // pass turn to the next player
-  //   const nextPlayerUid = getNextPlayer()
-  //   if (nextPlayerUid != '') {
-  //     gameState.turn = nextPlayerUid
-  //   } else {
-  //     console.log("ERROR: THERE IS NO NEXT PLAYER AND GAME NOT OVER")
-  //   }
-  // } else {
-  //   // GAME OVER
-  // }
+  checkIfGameIsOver(gameState)
 }
 
 /**

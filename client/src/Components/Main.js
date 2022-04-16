@@ -71,6 +71,10 @@ function Main(props) {
     }
   }, [connect2, setSocket2]);
 
+  useEffect(() => {
+    console.log("NEW STATE: ", gameState)
+  },[gameState])
+
   const connectToServer = () => {
     console.log("player 1", connect ? "disconnects" : "connects");
     setConnect(!connect);
@@ -118,12 +122,14 @@ function Main(props) {
           OnNewGameState={(state) => HandleManualNewGameState(state)}
         ></DevTools>
         <h2>El Juego</h2>
+        <div>Pile Size: '{gameState.drawPile.length}'</div>
         <div>Current Player: '{gameState.turn}'</div>
         { gameState.cardsLeftToPlay === 0 ? 
         <div>'{gameState.turn}' can still play</div>
         : 
         <div>Need to play: '{gameState.cardsLeftToPlay}' cards</div>
         }
+        <h3>{gameState.endResult}</h3>
         <CenterBoard
           piles={gameState?.piles ?? []}
           onSelectPile={(id) => {
