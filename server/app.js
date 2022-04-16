@@ -168,7 +168,6 @@ const canPlayCard = (uid, gameState) => {
 const checkIfGameIsOver = (gameState) => {
   var canPlay = canPlayCard(gameState.turn, gameState)
 
-  console.log('can Play?', canPlay, '. gameState.cardsLeftToPlay', gameState.cardsLeftToPlay)
   if (!canPlay) {
     const allHands = _.flattenDeep(gameState.hands.map(x => x.cards))
     // lose if
