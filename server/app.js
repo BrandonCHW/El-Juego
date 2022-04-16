@@ -67,7 +67,6 @@ io.on('connection', (socket) => {
 
     updateGame(action)
 
-    // console.log('new state: ', newGameState)
     socket.to(room).emit("new-game-state",  lobbies[0].gameState)
   })
 
@@ -139,12 +138,14 @@ const initNewGame = () => {
   lobbies[0].gameState = new GameState(hands, piles, drawPile, firstToPlayUid)
   console.log('Creating new game...')    
 }
+
 /**
- * Checks if game is over. If so, ends the game
+ * Checks if player can play a card with the current setup
+ * @param {*} uid 
  */
-const checkIfGameIsOver = (gameState) => {
-  var cannotPlay = true
-  const hand = gameState.getCards(gameState.turn)
+const canPlayCard = (uid, gameState) => {
+  var canPlay = false
+  const hand = gameState.getCards(uid)
   if (hand.length > 0) {
     hand.forEach(card => {
       // si une carte peut etre jouee, not over
@@ -156,19 +157,32 @@ const checkIfGameIsOver = (gameState) => {
         || card == gameState.pileTwo + 10
         || card == gameState.pileThree - 10
         || card == gameState.pileFour + 10) {
-          cannotPlay = false
+          canPlay = true
         }
     })
   } 
 
-  console.log('cannot play?', cannotPlay, '. gameState.cardsLeftToPlay', gameState.cardsLeftToPlay)
-  if (cannotPlay) {
+  return canPlay
+}
+
+/**
+ * Checks if game is over. If so, ends the game
+ */
+const checkIfGameIsOver = (gameState) => {
+  var canPlay = canPlayCard(gameState.turn, gameState)
+
+  console.log('can Play?', canPlay, '. gameState.cardsLeftToPlay', gameState.cardsLeftToPlay)
+  if (!canPlay) {
     const allHands = _.flattenDeep(gameState.hands.map(x => x.cards))
-    if (gameState.cardsLeftToPlay > 0) {    
-      // lose
+    // lose if
+    // 1. Can't play but still needs to play a card
+    // 2. Can't play and so can't the next player
+    if (gameState.cardsLeftToPlay > 0 || (gameState.cardsLeftToPlay == 0 && !canPlayCard(getNextPlayer(), gameState))) {   
+      console.log('next player cannot play?', !canPlayCard(getNextPlayer(), gameState))
       endGame(gameState, false)
-    } else if (allHands.length == 0) {      
-      // win
+    } 
+    // win if there are no cards left
+    else if (allHands.length == 0 && gameState.drawPile.length === 0) {
       endGame(gameState, true)
     }
     // otherwise, continue playing...
