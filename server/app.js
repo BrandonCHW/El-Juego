@@ -67,14 +67,16 @@ io.on('connection', (socket) => {
 
     updateGame(action)
 
-    socket.to(room).emit("new-game-state",  lobbies[0].gameState)
+    console.log(console.log(lobbies[0]))
+
+    io.to(room).emit("new-game-state",  lobbies[0].gameState)
   })
 
   socket.on('end-turn', (uid) => {
     // todo check that the emitter can end the turn
     endTurn(uid)
 
-    socket.to(room).emit("new-game-state", lobbies[0].gameState)
+    io.to(room).emit("new-game-state", lobbies[0].gameState)
   })
   
   socket.on('disconnect', () => {

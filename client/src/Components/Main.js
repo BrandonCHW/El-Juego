@@ -23,9 +23,10 @@ function Main(props) {
       console.log(
         `player 1 connected to: http://${window.location.hostname}:4000`
       );
-
       // events
       newSocket.on("new-game-state", (gameState) => {
+        console.log('RECEIVED NEW GAME STATE', gameState)
+        console.log(uid.current)
         setGameState(gameState);
       });
 
@@ -80,6 +81,10 @@ function Main(props) {
     setGameState(state);
   };
   /*******************************/
+
+  const handleTest = () => {
+    socket.emit('test')
+  }
 
   return (
     <>

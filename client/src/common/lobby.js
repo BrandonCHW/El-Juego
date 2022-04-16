@@ -15,6 +15,7 @@ class Lobby {
         name: name,        
         uid: uid
       })
+      console.log('New player added. Players: ', this.players)
     } else {
       console.log("player already registered")
     }
