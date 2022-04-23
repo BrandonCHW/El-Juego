@@ -1,22 +1,11 @@
 import './App.css';
 import { HashRouter as Router, Routes, Route, NavLink} from 'react-router-dom'
 import Main from './Components/Main'
-import TheTest from './Components/Test'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (
-	<Router basename='/'>
-	  <div>
-		<ul>
-			<li><NavLink to='/'>Lobby</NavLink></li>
-			<li><NavLink to='/test/'>Test</NavLink></li>
-		</ul>
-		<Routes>
-		  <Route exact path="/" element={<Main />} />
-		  <Route exact path='/test/' element={<TheTest />} />
-		</Routes>
-	  </div>
-	</Router>
+	<Main />
   );
 }
 

@@ -13,7 +13,7 @@ function PlayerCard(props) {
     
     return (
         <Button 
-            style={{background: props.isSelectedCard ? color : 'white'}}
+            variant='light'
             onClick={props.onClick}
             >
             {props.value}

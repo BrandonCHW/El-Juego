@@ -7,6 +7,7 @@ import io from "socket.io-client";
 import DevTools from "./DevTools";
 import PlayerAction from "../common/player-action";
 import GameState from "../common/game-state";
+import { Col, Container, Row } from "react-bootstrap";
 
 function Main(props) {
   // 1 state per values that tend to change together
@@ -82,68 +83,72 @@ function Main(props) {
   };
   /*******************************/
 
-  const handleTest = () => {
-    socket.emit('test')
-  }
-
   return (
-    <>
-      <div className="Main">
-        <DevTools
-          OnNewGameState={(state) => HandleManualNewGameState(state)}
-        ></DevTools>
-        <h2>El Juego</h2>
-        <div>Pile Size: '{gameState.drawPile.length}'</div>
-        <div>Current Player: '{gameState.turn}'</div>
-        { gameState.cardsLeftToPlay === 0 ? 
-        <div>'{gameState.turn}' can still play</div>
-        : 
-        <div>Need to play: '{gameState.cardsLeftToPlay}' cards</div>
-        }
-        <h3>{gameState.endResult}</h3>
-        <CenterBoard
-          piles={gameState?.piles ?? []}
-          onSelectPile={(id) => {
-            console.log("change pile to: ", id);
-            setSelectedPileId(id);
-          }}
-        />
-        <div>
-          <PlayerHand
-            name={"Player1 (" + uid.current + ")"}
-            hand={gameState?.hands.find(h => h.uid === uid.current)?.cards ?? [0, 0, 0, 0, 0, 0]}
-            onPlay={(value) => handlePlayCard(socket, uid, value)}
+    <Container fluid className="Main">
+      <Row sm={2} className="Bordered-Row">
+        <Col className="Bordered-Col">
+          <DevTools
+            OnNewGameState={(state) => HandleManualNewGameState(state)}>
+          </DevTools>
+        </Col>
+      </Row>
+      <Row sm={8} className="Bordered-Row">
+        <Col className="Bordered-Col">
+          <h2>El Juego</h2>
+          <div>Pile Size: '{gameState.drawPile.length}'</div>
+          <div>Current Player: '{gameState.turn}'</div>
+          { gameState.cardsLeftToPlay === 0 ? 
+          <div>'{gameState.turn}' can still play</div>
+          : 
+          <div>Need to play: '{gameState.cardsLeftToPlay}' cards</div>
+          }
+          <h3>{gameState.endResult}</h3>
+          <CenterBoard
+            piles={gameState?.piles ?? []}
+            onSelectPile={(id) => {
+              console.log("change pile to: ", id);
+              setSelectedPileId(id);
+            }}
           />
-          <Button onClick={() => connectToServer()}>P1 connect</Button>
-          {connect ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="32"
-              height="32"
-              fill="currentColor"
-              className="bi bi-check"
-              viewBox="0 0 16 16"
-              color="lightgreen"
-            >
-              <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z" />
-            </svg>
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="32"
-              height="32"
-              fill="currentColor"
-              className="bi bi-x"
-              viewBox="0 0 16 16"
-              color="red"
-            >
-              <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
-            </svg>
-          )}
-          <Button onClick={() => handleEndTurn(socket, uid.current)} disabled={gameState.turn!==uid.current} variant='secondary' size='sm'>P1 End Turn</Button>
-        </div>
-      </div>
-    </>
+        </Col>
+      </Row>
+      <Row sm={2} className="Bordered-Row">
+        <Col className="Bordered-Col">
+            <PlayerHand
+              name={"Player1 (" + uid.current + ")"}
+              hand={gameState?.hands.find(h => h.uid === uid.current)?.cards ?? [0, 0, 0, 0, 0, 0]}
+              onPlay={(value) => handlePlayCard(socket, uid, value)}
+            />
+            <Button onClick={() => connectToServer()}>P1 connect</Button>
+            {connect ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                fill="currentColor"
+                className="bi bi-check"
+                viewBox="0 0 16 16"
+                color="lightgreen"
+              >
+                <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z" />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                fill="currentColor"
+                className="bi bi-x"
+                viewBox="0 0 16 16"
+                color="red"
+              >
+                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+              </svg>
+            )}
+            <Button onClick={() => handleEndTurn(socket, uid.current)} disabled={gameState.turn!==uid.current} variant='secondary' size='sm'>P1 End Turn</Button>
+          </Col>
+      </Row>
+    </Container>
   );
 }
 
