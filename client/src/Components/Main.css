@@ -15,3 +15,14 @@
   border-style: dotted;
   border-color: greenyellow;
 }
+
+.CenterBoard {
+  justify-content: center;
+  flex: 1;
+  /* flex-direction: column;
+  flex-grow: 1; */
+}
+
+.PlayerHand {
+  justify-content: center;
+}

@@ -86,14 +86,14 @@ function Main(props) {
   return (
     <Container fluid className="Main">
       <Row sm={2} className="Bordered-Row">
-        <Col className="Bordered-Col">
+        <Col sm={2} className="Bordered-Col">
           <DevTools
             OnNewGameState={(state) => HandleManualNewGameState(state)}>
           </DevTools>
         </Col>
       </Row>
-      <Row sm={8} className="Bordered-Row">
-        <Col className="Bordered-Col">
+      <Row className="Bordered-Row CenterBoard">
+        <Col sm={4} className="Bordered-Col">
           <h2>El Juego</h2>
           <div>Pile Size: '{gameState.drawPile.length}'</div>
           <div>Current Player: '{gameState.turn}'</div>
@@ -112,7 +112,7 @@ function Main(props) {
           />
         </Col>
       </Row>
-      <Row sm={2} className="Bordered-Row">
+      <Row sm={2} className="Bordered-Row PlayerHand">
         <Col className="Bordered-Col">
             <PlayerHand
               name={"Player1 (" + uid.current + ")"}
