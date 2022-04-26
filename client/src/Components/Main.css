@@ -4,6 +4,8 @@
     min-height: 100vh;
     font-size: calc(10px + 2vmin);
     color: white;
+    display: flex;
+    flex-direction: column;
   }
 
 .Bordered-Row {
@@ -18,11 +20,10 @@
 
 .CenterBoard {
   justify-content: center;
-  flex: 1;
-  /* flex-direction: column;
-  flex-grow: 1; */
+  flex: 4;
 }
 
 .PlayerHand {
   justify-content: center;
+  flex: 1;
 }
